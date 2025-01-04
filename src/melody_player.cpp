@@ -226,7 +226,7 @@ void MelodyPlayer::turnOn() {
   const int resolution = 8;
   // 2000 is a frequency, it will be changed at the first play
 #if defined(ESP_IDF_VERSION_MAJOR) && ESP_IDF_VERSION_MAJOR >= 5
-  if (pwmChannel >= LEDC_CHANNELS) {
+  if (pwmChannel == 0xFF) {
     // LEDC channel will be selected automatically
     ledcAttach(pin, 2000,resolution);
   } else {
