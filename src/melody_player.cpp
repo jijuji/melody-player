@@ -40,14 +40,22 @@ void MelodyPlayer::play() {
                      + " duration:" + computedNote.duration);
     if (melodyState->isSilence()) {
 #ifdef ESP32
+#if defined(ESP_IDF_VERSION_MAJOR) && ESP_IDF_VERSION_MAJOR >= 5
+      ledcWriteTone(pin, 0);
+#else
       ledcWriteTone(pwmChannel, 0);
+#endif
 #else
       noTone(pin);
 #endif
       delay(0.3f * computedNote.duration);
     } else {
 #ifdef ESP32
+#if defined(ESP_IDF_VERSION_MAJOR) && ESP_IDF_VERSION_MAJOR >= 5
+      ledcWriteTone(pin, computedNote.frequency);
+#else
       ledcWriteTone(pwmChannel, computedNote.frequency);
+#endif
 #else
       tone(pin, computedNote.frequency);
 #endif
@@ -87,7 +95,11 @@ void changeTone(MelodyPlayer* player) {
 
     if (player->melodyState->isSilence()) {
 #ifdef ESP32
+#if defined(ESP_IDF_VERSION_MAJOR) && ESP_IDF_VERSION_MAJOR >= 5
+      ledcWriteTone(player->pin, 0);
+#else
       ledcWriteTone(player->pwmChannel, 0);
+#endif
 #else
       tone(player->pin, 0);
 #endif
@@ -99,7 +111,11 @@ void changeTone(MelodyPlayer* player) {
 #endif
     } else {
 #ifdef ESP32
+#if defined(ESP_IDF_VERSION_MAJOR) && ESP_IDF_VERSION_MAJOR >= 5
+      ledcWriteTone(player->pin, computedNote.frequency);
+#else
       ledcWriteTone(player->pwmChannel, computedNote.frequency);
+#endif
 #else
       tone(player->pin, computedNote.frequency);
 #endif
@@ -209,16 +225,31 @@ void MelodyPlayer::turnOn() {
 #ifdef ESP32
   const int resolution = 8;
   // 2000 is a frequency, it will be changed at the first play
+#if defined(ESP_IDF_VERSION_MAJOR) && ESP_IDF_VERSION_MAJOR >= 5
+  if (pwmChannel >= LEDC_CHANNELS) {
+    // LEDC channel will be selected automatically
+    ledcAttach(pin, 2000,resolution);
+  } else {
+    ledcAttachChannel(pin, 2000,resolution, pwmChannel);
+  }
+  ledcWrite(pin, 125);
+#else
   ledcSetup(pwmChannel, 2000, resolution);
   ledcAttachPin(pin, pwmChannel);
   ledcWrite(pwmChannel, 125);
+#endif
 #endif
 }
 
 void MelodyPlayer::turnOff() {
 #ifdef ESP32
+#if defined(ESP_IDF_VERSION_MAJOR) && ESP_IDF_VERSION_MAJOR >= 5
+  ledcWrite(pin, 0);
+  ledcDetach(pin);
+#else
   ledcWrite(pwmChannel, 0);
   ledcDetachPin(pin);
+#endif
 #else
   // Remember that this will set LOW output, it doesn't mean that buzzer is off (look at offLevel
   // for more info).
