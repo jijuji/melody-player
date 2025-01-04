@@ -1,6 +1,6 @@
 {
   "name": "Melody Player",
-  "version": "2.4.0",
+  "version": "3.0.0",
   "authors": {
     "name": "Fabiano Riccardi",
     "email": "fabiano.riccardi@outlook.com"
@@ -17,7 +17,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/fabianoriccardi/melody-player"
+    "url": "https://github.com/jijuji/melody-player"
   },
   "licence": "LGPL-2.1-or-later",
   "frameworks": [
